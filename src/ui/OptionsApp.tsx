@@ -31,7 +31,7 @@ export default function OptionsApp() {
             className="w-full bg-input border border-border rounded-md px-3 py-2 text-foreground mb-4"
           >
             <option value="openai">OpenAI (GPT-4o / GPT-3.5)</option>
-            <option value="gemini">Google Gemini (Gemini 1.5)</option>
+            <option value="gemini">Google Gemini (Gemini 2.5 Lite)</option>
           </select>
 
           <label className="block text-sm font-medium mb-1">API Key</label>
