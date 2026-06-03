@@ -1,0 +1,63 @@
+name: Build and Release Extension
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build extension
+      run: npm run build
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: apiinspector-extension
+        path: dist/
+        retention-days: 7
+
+    - name: Zip for Chrome Web Store
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        cd dist
+        zip -r ../apiinspector-extension.zip ./*
+      
+    - name: Upload Release Zip
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: apiinspector-release-zip
+        path: apiinspector-extension.zip
+        retention-days: 14
+
+    - name: Publish GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        VERSION=$(node -p "require('./package.json').version")
+        TAG="v${VERSION}-build.${{ github.run_number }}"
+        gh release create "$TAG" apiinspector-extension.zip \
+          --title "APIInspector $TAG" \
+          --notes "Automated build and release from GitHub Actions."

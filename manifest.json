@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "APIInspector",
+  "version": "1.0.0",
+  "description": "Modern developer-focused API debugging and traffic inspection platform.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "devtools_page": "devtools.html",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "icons": {
+    "16": "src/assets/logo.png",
+    "48": "src/assets/logo.png",
+    "128": "src/assets/logo.png"
+  }
+}
